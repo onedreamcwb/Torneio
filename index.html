@@ -59,11 +59,12 @@
             <div class="card">
                 <h2>CADASTRO DE AMIGOS</h2>
                 <div class="input-group">
-                    <input type="text" id="new-member-name" placeholder="Nome do novo membro..." class="poker-input">
+                    <input type="text" id="new-member-name" placeholder="Nome..." class="poker-input" style="flex: 1;">
+                    <input type="url" id="new-member-photo" placeholder="Link da Foto (Opcional)..." class="poker-input" style="flex: 2;">
                     <button class="btn-poker btn-start" onclick="registerNewMember()">CADASTRAR</button>
                 </div>
                 <table class="poker-table">
-                    <thead><tr><th>NOME</th><th>DATA CADASTRO</th><th>AÇÃO</th></tr></thead>
+                    <thead><tr><th>JOGADOR</th><th>DATA CADASTRO</th><th>AÇÃO</th></tr></thead>
                     <tbody id="members-list-table"></tbody>
                 </table>
             </div>

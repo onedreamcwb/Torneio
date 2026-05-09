@@ -108,3 +108,27 @@ select.poker-input option { background: var(--card-bg); }
 .poker-table input[type="number"] {
     -moz-appearance: textfield;
 }
+/* ==========================================
+   ESTILIZAÇÃO DOS AVATARES (FOTOS DE PERFIL)
+   ========================================== */
+.player-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.player-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%; /* Deixa a foto redonda */
+    object-fit: cover; /* Evita que a foto fique esticada */
+    border: 2px solid var(--primary); /* Bordinha verde padrão */
+    background-color: var(--bg-color);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
+}
+
+/* Deixa o avatar dourado para o 1º lugar no Ranking */
+.rank-gold .player-avatar {
+    border-color: #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+}

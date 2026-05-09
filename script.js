@@ -36,9 +36,6 @@ window.onload = () => {
     renderBlindConfig();
 };
 
-// ==========================================
-// NAVEGAÇÃO
-// ==========================================
 function showSection(sectionId, btnElement) {
     document.querySelectorAll('.spa-section').forEach(sec => sec.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -47,7 +44,20 @@ function showSection(sectionId, btnElement) {
 }
 
 // ==========================================
-// TIMER E BLINDS (Transição contínua + Cores)
+// FUNÇÃO AUXILIAR: AVATAR INTELIGENTE
+// ==========================================
+// Se o cara não tiver foto cadastrada, cria um avatar verde com as iniciais do nome dele
+function getPlayerPhoto(playerName) {
+    const member = members.find(m => m.name === playerName);
+    if (member && member.photo) {
+        return member.photo;
+    }
+    // API que gera a imagem com iniciais
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(playerName)}&background=22c55e&color=fff&bold=true&size=100`;
+}
+
+// ==========================================
+// TIMER E BLINDS 
 // ==========================================
 function updateTimerDisplay() {
     const min = Math.floor(timerSeconds / 60);
@@ -160,18 +170,25 @@ function resetDefaultBlinds() {
 }
 
 // ==========================================
-// GESTÃO DE MEMBROS E JOGO
+// GESTÃO DE MEMBROS E AVATARES
 // ==========================================
 function registerNewMember() {
-    const input = document.getElementById('new-member-name');
-    const name = input.value.trim();
+    const nameInput = document.getElementById('new-member-name');
+    const photoInput = document.getElementById('new-member-photo');
+    
+    const name = nameInput.value.trim();
+    const photo = photoInput.value.trim();
+    
     if (!name) return;
 
     if (members.find(m => m.name === name)) return alert("Este membro já existe!");
 
-    members.push({ name: name, date: new Date().toLocaleDateString() });
+    // Salva o membro com a foto (se tiver), se não fica vazio e a API resolve
+    members.push({ name: name, photo: photo, date: new Date().toLocaleDateString() });
     localStorage.setItem('dc_members', JSON.stringify(members));
-    input.value = "";
+    
+    nameInput.value = "";
+    photoInput.value = "";
     renderMembers();
 }
 
@@ -181,7 +198,12 @@ function renderMembers() {
     
     table.innerHTML = members.map((m, i) => `
         <tr>
-            <td>${m.name}</td>
+            <td>
+                <div class="player-profile">
+                    <img src="${getPlayerPhoto(m.name)}" class="player-avatar" alt="${m.name}">
+                    <span>${m.name}</span>
+                </div>
+            </td>
             <td>${m.date}</td>
             <td><button class="btn-remove" onclick="deleteMember(${i})">X</button></td>
         </tr>
@@ -199,6 +221,9 @@ function deleteMember(index) {
     }
 }
 
+// ==========================================
+// GESTÃO DO JOGO ATUAL
+// ==========================================
 function addMemberToTable() {
     const select = document.getElementById('member-select');
     const name = select.value;
@@ -222,7 +247,12 @@ function renderPlayers() {
 
     tbody.innerHTML = activePlayers.map((p, i) => `
         <tr>
-            <td class="${p.status === 'Ativo' ? 'status-active' : 'status-busted'}">${p.name}</td>
+            <td class="${p.status === 'Ativo' ? 'status-active' : 'status-busted'}">
+                <div class="player-profile">
+                    <img src="${getPlayerPhoto(p.name)}" class="player-avatar" alt="${p.name}">
+                    <span>${p.name}</span>
+                </div>
+            </td>
             <td class="${p.status === 'Ativo' ? 'status-active' : 'status-busted'}">${p.status}</td>
             <td>${p.rebuys}</td>
             <td>
@@ -271,6 +301,9 @@ function saveGameState() {
     localStorage.setItem('dc_active_game', JSON.stringify(activePlayers)); 
 }
 
+// ==========================================
+// RANKING
+// ==========================================
 function finishTournament() {
     if (activePlayers.length === 0) return alert("Não há jogo para encerrar.");
     if (!confirm("Isso vai encerrar o jogo e atualizar o Ranking Geral. Confirmar?")) return;
@@ -315,7 +348,12 @@ function renderRanking() {
         return `
             <tr class="${medal}">
                 <td>${i + 1}º</td>
-                <td>${name}</td>
+                <td>
+                    <div class="player-profile">
+                        <img src="${getPlayerPhoto(name)}" class="player-avatar" alt="${name}">
+                        <span>${name}</span>
+                    </div>
+                </td>
                 <td>${stats.games}</td>
                 <td>${stats.wins}</td>
                 <td style="color: ${stats.profit >= 0 ? 'var(--primary)' : 'var(--danger)'}">
