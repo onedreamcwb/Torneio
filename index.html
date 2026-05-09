@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DreamClub - Poker Home Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="tv-nav">
+        <button onclick="showSection('timer-section', this)" class="nav-btn active">TIMER DA MESA</button>
+        <button onclick="showSection('players-section', this)" class="nav-btn">CONTROLE DE JOGADORES</button>
+        <button onclick="showSection('prize-section', this)" class="nav-btn">PREMIAÇÃO (PRIZE POOL)</button>
+        <button onclick="showSection('config-section', this)" class="nav-btn">BLINDS</button>
+    </nav>
+
+    <main class="container">
+        <!-- SEÇÃO 1: TIMER E INFOS DA MESA -->
+        <section id="timer-section" class="spa-section active">
+            <div class="tournament-stats">
+                <div class="stat-box">
+                    <span>JOGADORES ATIVOS</span>
+                    <h3 id="display-active-players">0 / 0</h3>
+                </div>
+                <div class="stat-box prize-highlight">
+                    <span>PRIZE POOL (POTE)</span>
+                    <h3 id="display-prize-pool">R$ 0,00</h3>
+                </div>
+                <div class="stat-box">
+                    <span>MÉDIA DE FICHAS</span>
+                    <h3 id="display-average-stack">0</h3>
+                </div>
+            </div>
+
+            <div class="blind-info">
+                <div class="blind-box">
+                    <span>BLIND ATUAL</span>
+                    <h2 id="display-current-blind">5 / 10</h2>
+                </div>
+                <div class="blind-box">
+                    <span>PRÓXIMO BLIND</span>
+                    <h3 id="display-next-blind">10 / 20</h3>
+                </div>
+            </div>
+            
+            <div class="timer-display" id="timer">15:00</div>
+            
+            <div class="controls">
+                <button class="btn-poker btn-skip" onclick="previousLevel()">⏮ VOLTAR</button>
+                <button class="btn-poker btn-start" onclick="toggleTimer()" id="btn-play">▶ PLAY</button>
+                <button class="btn-poker btn-reset" onclick="resetTimer()">↺ RESET</button>
+                <button class="btn-poker btn-skip" onclick="nextLevel()">⏭ PRÓXIMO</button>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: CONTROLE DE JOGADORES -->
+        <section id="players-section" class="spa-section">
+            <div class="card">
+                <h2>ADICIONAR JOGADOR</h2>
+                <div class="input-group">
+                    <input type="text" id="player-name" placeholder="Nome do jogador..." onkeypress="handleEnter(event)">
+                    <button class="btn-poker btn-start" onclick="addPlayer()">ENTRAR (R$ 1,00)</button>
+                </div>
+
+                <h2>GERENCIAMENTO DA MESA (Ações Rápidas)</h2>
+                <p class="helper-text">Stack Inicial: 500 Fichas. Cada clique em + Rebuy adiciona R$ 1,00 ao Pote de Premiação e recalcula a média da mesa.</p>
+                <table class="poker-table">
+                    <thead>
+                        <tr>
+                            <th>JOGADOR</th>
+                            <th>STATUS</th>
+                            <th>REBUYS (R$)</th>
+                            <th>AÇÃO NA MESA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="player-list"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: PREMIAÇÃO -->
+        <section id="prize-section" class="spa-section">
+            <div class="card">
+                <h2>DIVISÃO DO PRIZE POOL</h2>
+                <p class="helper-text">Para jogos com Buy-in de R$ 1,00, o modelo recomendado é o Vencedor Levar Tudo para gerar um prêmio relevante.</p>
+                <div class="prize-board">
+                    <div class="prize-total">
+                        ARRECADAÇÃO TOTAL: <span id="total-money-prize" class="lucro-positivo">R$ 0,00</span>
+                    </div>
+                    
+                    <table class="poker-table" style="margin-top: 30px;">
+                        <thead>
+                            <tr>
+                                <th>POSIÇÃO</th>
+                                <th>RECOMENDADO (Winner Takes All)</th>
+                                <th>DIVISÃO 70/30</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color:var(--accent);">1º LUGAR 🏆</strong></td>
+                                <td id="prize-winner-all" style="color:var(--primary); font-weight:bold; font-size: 32px;">R$ 0,00</td>
+                                <td id="prize-first">R$ 0,00</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color:var(--text-dim);">2º LUGAR 🥈</strong></td>
+                                <td style="color:var(--danger);">-</td>
+                                <td id="prize-second">R$ 0,00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn-remove" onclick="resetTournament()" style="margin-top: 40px; width: 100%; padding: 20px; font-size: 24px;">Zerar Torneio para Nova Partida</button>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 4: CONFIGURAÇÃO DE BLINDS -->
+        <section id="config-section" class="spa-section">
+            <div class="card">
+                <h2>ESTRUTURA DE BLINDS (Otimizada para Stack 500)</h2>
+                <table class="poker-table">
+                    <thead>
+                        <tr>
+                            <th>NÍVEL</th>
+                            <th>SMALL</th>
+                            <th>BIG</th>
+                            <th>TEMPO (MIN)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="blind-config-list"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <audio id="alert-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+    <script src="script.js"></script>
+</body>
+</html>
