@@ -1,7 +1,11 @@
 // ==========================================
 // CONFIGURAÇÕES E ESTADO
 // ==========================================
+const BUYIN_MONEY = 1.00; 
+const REBUY_MONEY = 1.00; 
 const STARTING_CHIPS = 500;
+const REBUY_CHIPS = 500;
+
 const DEFAULT_BLINDS = [
     { level: 1, sb: 5, bb: 10, duration: 15 },
     { level: 2, sb: 10, bb: 20, duration: 15 },
@@ -13,11 +17,10 @@ const DEFAULT_BLINDS = [
     { level: 8, sb: 150, bb: 300, duration: 15 }
 ];
 
-// O SEGREDO ESTÁ AQUI: Criamos uma variável que pode ser editada (blindLevels) em vez de usar sempre a FIXA (DEFAULT_BLINDS)
 let blindLevels = JSON.parse(localStorage.getItem('dc_blinds')) || JSON.parse(JSON.stringify(DEFAULT_BLINDS));
 let members = JSON.parse(localStorage.getItem('dc_members')) || [];
 let ranking = JSON.parse(localStorage.getItem('dc_ranking')) || {}; 
-let activePlayers = []; 
+let activePlayers = JSON.parse(localStorage.getItem('dc_active_game')) || []; 
 
 let currentLevelIdx = 0;
 let timerSeconds = blindLevels[0].duration * 60; 
@@ -28,6 +31,8 @@ window.onload = () => {
     updateTimerDisplay();
     renderMembers();
     renderRanking();
+    renderPlayers();
+    updateTournamentStats();
     renderBlindConfig();
 };
 
@@ -42,12 +47,21 @@ function showSection(sectionId, btnElement) {
 }
 
 // ==========================================
-// TIMER E BLINDS
+// TIMER E BLINDS (Transição contínua + Cores)
 // ==========================================
 function updateTimerDisplay() {
     const min = Math.floor(timerSeconds / 60);
     const sec = timerSeconds % 60;
-    document.getElementById('timer').innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+    const timerElement = document.getElementById('timer');
+    
+    timerElement.innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+
+    timerElement.classList.remove('timer-warning', 'timer-danger');
+    if (timerSeconds <= 60 && timerSeconds > 10) {
+        timerElement.classList.add('timer-warning'); 
+    } else if (timerSeconds <= 10 && timerSeconds > 0) {
+        timerElement.classList.add('timer-danger'); 
+    }
 }
 
 function toggleTimer() {
@@ -56,11 +70,16 @@ function toggleTimer() {
         clearInterval(timerInterval);
         timerInterval = null;
         btn.innerText = "▶ PLAY";
+        btn.style.backgroundColor = "var(--primary)";
     } else {
         btn.innerText = "⏸ PAUSE";
+        btn.style.backgroundColor = "var(--accent)";
         timerInterval = setInterval(() => {
+            if (timerSeconds === 60) {
+                document.getElementById('warning-sound').play().catch(e=>console.log("Audio blq"));
+            }
             if (timerSeconds <= 0) {
-                document.getElementById('alert-sound').play();
+                document.getElementById('alert-sound').play().catch(e=>console.log("Audio blq"));
                 nextLevel(); 
             } else {
                 timerSeconds--;
@@ -77,8 +96,8 @@ function nextLevel() {
         updateBlindDisplay();
         updateTimerDisplay();
     } else {
-        clearInterval(timerInterval);
-        alert("Torneio Finalizado!");
+        alert("Último nível da estrutura atingido!");
+        resetTimer();
     }
 }
 
@@ -92,7 +111,11 @@ function previousLevel() {
 }
 
 function resetTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
     timerSeconds = blindLevels[currentLevelIdx].duration * 60;
+    document.getElementById('btn-play').innerText = "▶ PLAY";
+    document.getElementById('btn-play').style.backgroundColor = "var(--primary)";
     updateTimerDisplay();
 }
 
@@ -104,25 +127,23 @@ function updateBlindDisplay() {
 }
 
 // ==========================================
-// CONFIGURAÇÃO EDITÁVEL DE BLINDS (CORRIGIDA)
+// CONFIGURAÇÃO EDITÁVEL DE BLINDS
 // ==========================================
 function renderBlindConfig() {
     const tbody = document.getElementById('blind-config-list');
     tbody.innerHTML = blindLevels.map((b, i) => `
         <tr>
             <td>Nível ${b.level}</td>
-            <td><input type="number" value="${b.sb}" onchange="updateBlindData(${i}, 'sb', this.value)" style="width:100px; text-align:center;"></td>
-            <td><input type="number" value="${b.bb}" onchange="updateBlindData(${i}, 'bb', this.value)" style="width:100px; text-align:center;"></td>
-            <td><input type="number" value="${b.duration}" onchange="updateBlindData(${i}, 'duration', this.value)" style="width:100px; text-align:center;"></td>
+            <td><input type="number" value="${b.sb}" onchange="updateBlindData(${i}, 'sb', this.value)"></td>
+            <td><input type="number" value="${b.bb}" onchange="updateBlindData(${i}, 'bb', this.value)"></td>
+            <td><input type="number" value="${b.duration}" onchange="updateBlindData(${i}, 'duration', this.value)"></td>
         </tr>
     `).join('');
 }
 
 function updateBlindData(index, field, value) {
     blindLevels[index][field] = parseInt(value) || 0;
-    localStorage.setItem('dc_blinds', JSON.stringify(blindLevels)); // Salva no cache da TV
-    
-    // Se você estiver alterando o nível que está tocando agora na tela, ele já atualiza ao vivo
+    localStorage.setItem('dc_blinds', JSON.stringify(blindLevels)); 
     if (index === currentLevelIdx || index === currentLevelIdx + 1) {
         updateBlindDisplay();
     }
@@ -139,7 +160,7 @@ function resetDefaultBlinds() {
 }
 
 // ==========================================
-// GESTÃO DE MEMBROS E JOGO (Restante igual)
+// GESTÃO DE MEMBROS E JOGO
 // ==========================================
 function registerNewMember() {
     const input = document.getElementById('new-member-name');
@@ -185,22 +206,31 @@ function addMemberToTable() {
 
     if (activePlayers.find(p => p.name === name)) return alert("Jogador já está na mesa!");
 
-    activePlayers.push({ name: name, status: 'Ativo', rebuys: 0, finalProfit: -1.00 }); 
+    activePlayers.push({ name: name, status: 'Ativo', rebuys: 0, tempGain: 0 }); 
+    saveGameState();
     renderPlayers();
     updateTournamentStats();
 }
 
 function renderPlayers() {
     const tbody = document.getElementById('player-list');
+    
+    if(activePlayers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-dim);">A mesa está vazia. Adicione os jogadores acima.</td></tr>`;
+        return;
+    }
+
     tbody.innerHTML = activePlayers.map((p, i) => `
         <tr>
-            <td class="${p.status === 'Ativo' ? '' : 'status-busted'}">${p.name}</td>
-            <td>${p.status}</td>
+            <td class="${p.status === 'Ativo' ? 'status-active' : 'status-busted'}">${p.name}</td>
+            <td class="${p.status === 'Ativo' ? 'status-active' : 'status-busted'}">${p.status}</td>
             <td>${p.rebuys}</td>
-            <td><input type="number" placeholder="Prêmio (R$)" onchange="updateProfit(${i}, this.value)" style="width:120px"></td>
+            <td>
+                <input type="number" placeholder="0.00" step="1" min="0" onchange="updateProfit(${i}, this.value)" value="${p.tempGain > 0 ? p.tempGain : ''}">
+            </td>
             <td>
                 <button class="btn-action" onclick="addRebuy(${i})">+ RB</button>
-                <button class="btn-remove" onclick="toggleBust(${i})">${p.status === 'Ativo' ? 'Bust' : 'Venceu'}</button>
+                <button class="btn-remove" onclick="toggleBust(${i})">${p.status === 'Ativo' ? 'Bust (Caiu)' : 'Voltar'}</button>
             </td>
         </tr>
     `).join('');
@@ -208,28 +238,41 @@ function renderPlayers() {
 
 function addRebuy(index) {
     activePlayers[index].rebuys++;
-    activePlayers[index].finalProfit -= 1.00; 
+    saveGameState();
     updateTournamentStats();
     renderPlayers();
 }
 
 function toggleBust(index) {
     activePlayers[index].status = activePlayers[index].status === 'Ativo' ? 'Eliminado' : 'Ativo';
+    saveGameState();
     renderPlayers();
 }
 
 function updateProfit(index, val) {
     activePlayers[index].tempGain = parseFloat(val) || 0;
+    saveGameState();
 }
 
 function updateTournamentStats() {
-    let totalMoney = activePlayers.length + activePlayers.reduce((sum, p) => sum + p.rebuys, 0);
+    let totalMoney = (activePlayers.length * BUYIN_MONEY) + activePlayers.reduce((sum, p) => sum + (p.rebuys * REBUY_MONEY), 0);
+    let playersAlive = activePlayers.filter(p => p.status === 'Ativo').length;
+    let totalChips = (activePlayers.length * STARTING_CHIPS) + activePlayers.reduce((sum, p) => sum + (p.rebuys * REBUY_CHIPS), 0);
+    let averageStack = playersAlive > 0 ? Math.floor(totalChips / playersAlive) : 0;
+
+    document.getElementById('display-active-players').innerText = `${playersAlive} / ${activePlayers.length}`;
+    document.getElementById('display-average-stack').innerText = averageStack.toLocaleString('pt-BR');
     document.getElementById('display-prize-pool').innerText = `R$ ${totalMoney.toFixed(2)}`;
     document.getElementById('total-money-prize').innerText = `R$ ${totalMoney.toFixed(2)}`;
     document.getElementById('prize-winner-all').innerText = `R$ ${totalMoney.toFixed(2)}`;
 }
 
+function saveGameState() { 
+    localStorage.setItem('dc_active_game', JSON.stringify(activePlayers)); 
+}
+
 function finishTournament() {
+    if (activePlayers.length === 0) return alert("Não há jogo para encerrar.");
     if (!confirm("Isso vai encerrar o jogo e atualizar o Ranking Geral. Confirmar?")) return;
 
     activePlayers.forEach(p => {
@@ -237,7 +280,7 @@ function finishTournament() {
         
         ranking[p.name].games += 1;
         
-        const sessionProfit = (p.tempGain || 0) - (1.00 + p.rebuys);
+        const sessionProfit = (p.tempGain || 0) - (BUYIN_MONEY + (p.rebuys * REBUY_MONEY));
         ranking[p.name].profit += sessionProfit;
         
         if (p.tempGain > 0) ranking[p.name].wins += 1; 
@@ -245,11 +288,15 @@ function finishTournament() {
 
     localStorage.setItem('dc_ranking', JSON.stringify(ranking));
     activePlayers = [];
+    currentLevelIdx = 0;
+    saveGameState();
+    
     alert("Ranking Atualizado!");
+    resetTimer();
+    renderPlayers();
+    updateTournamentStats();
     renderRanking();
     
-    document.getElementById('display-prize-pool').innerText = "R$ 0.00";
-    renderPlayers();
     showSection('ranking-section', document.querySelectorAll('.nav-btn')[3]);
 }
 
@@ -257,6 +304,11 @@ function renderRanking() {
     const table = document.getElementById('global-ranking-table');
     const sorted = Object.entries(ranking)
         .sort((a, b) => b[1].profit - a[1].profit);
+
+    if (sorted.length === 0) {
+        table.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-dim);">Nenhum histórico registrado.</td></tr>`;
+        return;
+    }
 
     table.innerHTML = sorted.map(([name, stats], i) => {
         let medal = i === 0 ? 'rank-gold' : (i === 1 ? 'rank-silver' : (i === 2 ? 'rank-bronze' : ''));

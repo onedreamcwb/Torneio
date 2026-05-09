@@ -47,7 +47,7 @@
                 </div>
                 <table class="poker-table">
                     <thead>
-                        <tr><th>JOGADOR</th><th>STATUS</th><th>REBUYS</th><th>FICHAS FINAIS</th><th>AÇÃO</th></tr>
+                        <tr><th>JOGADOR</th><th>STATUS</th><th>REBUYS (R$)</th><th>PRÊMIO GANHO (R$)</th><th>AÇÕES DA MESA</th></tr>
                     </thead>
                     <tbody id="player-list"></tbody>
                 </table>
@@ -88,7 +88,7 @@
                 <table class="poker-table" style="margin-top: 20px;">
                     <thead><tr><th>POSIÇÃO</th><th>PRÊMIO</th></tr></thead>
                     <tbody>
-                        <tr><td><strong style="color:var(--accent);">1º LUGAR (Campeão)</strong></td><td id="prize-winner-all">R$ 0,00</td></tr>
+                        <tr><td><strong style="color:var(--accent);">1º LUGAR (Campeão)</strong></td><td id="prize-winner-all" style="color:var(--primary); font-weight:bold; font-size: 32px;">R$ 0,00</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -115,6 +115,7 @@
     </main>
 
     <audio id="alert-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+    <audio id="warning-sound" src="https://actions.google.com/sounds/v1/alarms/dos_eight_pips.ogg"></audio>
     <script src="script.js"></script>
 </body>
 </html>
