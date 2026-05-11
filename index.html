@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DreamClub - Poker Home Game</title>
+    <title>Dream House - Poker Club</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <nav class="tv-nav">
-        <button onclick="showSection('timer-section', this)" class="nav-btn active">TIMER DA MESA</button>
-        <button onclick="showSection('players-section', this)" class="nav-btn">JOGO ATUAL</button>
+        <button onclick="showSection('timer-section', this)" class="nav-btn active">TIMER</button>
+        <button onclick="showSection('players-section', this)" class="nav-btn">MESA</button>
         <button onclick="showSection('members-section', this)" class="nav-btn">MEMBROS</button>
-        <button onclick="showSection('ranking-section', this)" class="nav-btn">RANKING GERAL</button>
-        <button onclick="showSection('prize-section', this)" class="nav-btn">PREMIAÇÃO</button>
+        <button onclick="showSection('ranking-section', this)" class="nav-btn">RANKING</button>
+        <button onclick="showSection('prize-section', this)" class="nav-btn">PRÊMIO</button>
+        <button onclick="showSection('schedule-section', this)" class="nav-btn">AGENDA</button>
+        <button onclick="showSection('about-section', this)" class="nav-btn">QUEM SOMOS</button>
         <button onclick="showSection('config-section', this)" class="nav-btn">BLINDS</button>
     </nav>
 
@@ -57,7 +59,7 @@
 
         <section id="members-section" class="spa-section">
             <div class="card">
-                <h2>CADASTRO DE AMIGOS</h2>
+                <h2>CADASTRO DE MEMBROS (DREAM HOUSE)</h2>
                 <div class="input-group">
                     <input type="text" id="new-member-name" placeholder="Nome..." class="poker-input" style="flex: 1;">
                     <input type="url" id="new-member-photo" placeholder="Link da Foto (Opcional)..." class="poker-input" style="flex: 2;">
@@ -95,18 +97,51 @@
             </div>
         </section>
 
+        <section id="schedule-section" class="spa-section">
+            <div class="card">
+                <h2>AGENDA DA DREAM HOUSE</h2>
+                <p class="helper-text">Próximos eventos oficiais confirmados no nosso clube.</p>
+                <table class="poker-table">
+                    <thead>
+                        <tr><th>DATA / HORA</th><th>EVENTO / FORMATO</th><th>BUY-IN</th><th>STATUS</th></tr>
+                    </thead>
+                    <tbody id="schedule-list">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="about-section" class="spa-section">
+            <div class="card" style="text-align: center; padding: 60px 40px;">
+                <h2 style="font-size: 50px; color: var(--primary); text-shadow: 0 0 20px var(--primary-glow); border: none;">DREAM HOUSE</h2>
+                <h3 style="color: var(--accent); letter-spacing: 5px; margin-bottom: 30px;">POKER CLUB</h3>
+                
+                <img src="" style="border-radius: 50%; margin: 20px auto; border: 4px solid var(--primary); box-shadow: 0 0 30px var(--primary-glow);" alt="Dream House Logo">
+                
+                <p style="font-size: 24px; color: var(--text-main); line-height: 1.6; max-width: 900px; margin: 40px auto;">
+                    O mais exclusivo e tecnológico home game da região. A <strong>Dream House</strong> foi criada para reunir amigos em torno da mesa com uma estrutura de nível profissional. Levamos o Poker a sério: respeito às regras, estratégia afiada, gestão de bankroll e rivalidade saudável. No feltro não há amizade, apenas esporte mental.
+                </p>
+                
+                <div style="margin-top: 50px; display: flex; justify-content: center; gap: 60px;">
+                    <div class="stat-box" style="flex: none; width: 250px;">
+                        <span>MODALIDADE</span>
+                        <h3 style="font-size: 30px;">SNG 4-Handed</h3>
+                    </div>
+                    <div class="stat-box" style="flex: none; width: 250px;">
+                        <span>REGRA BASE</span>
+                        <h3 style="font-size: 30px;">Winner Takes All</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="config-section" class="spa-section">
             <div class="card">
                 <h2>ESTRUTURA DE BLINDS (EDITÁVEL)</h2>
                 <p class="helper-text">* As edições são salvas automaticamente no navegador.</p>
                 <table class="poker-table">
                     <thead>
-                        <tr>
-                            <th>NÍVEL</th>
-                            <th>SMALL BLIND</th>
-                            <th>BIG BLIND</th>
-                            <th>TEMPO (MIN)</th>
-                        </tr>
+                        <tr><th>NÍVEL</th><th>SMALL BLIND</th><th>BIG BLIND</th><th>TEMPO (MIN)</th></tr>
                     </thead>
                     <tbody id="blind-config-list"></tbody>
                 </table>

@@ -17,6 +17,13 @@ const DEFAULT_BLINDS = [
     { level: 8, sb: 150, bb: 300, duration: 15 }
 ];
 
+// LISTA DE PRÓXIMOS TORNEIOS (Edite aqui facilmente!)
+const TOURNAMENT_SCHEDULE = [
+    { date: "Sexta-feira, 20:00", event: "Dream House Main Event", buyin: "R$ 1,00", status: "Confirmado" },
+    { date: "Sábado, 19:30", event: "Deepstack Turbo (Stack 1000)", buyin: "R$ 2,00", status: "Inscrições Abertas" },
+    { date: "Quarta-feira, 20:00", event: "Sit & Go Casual", buyin: "R$ 1,00", status: "Aguardando Quórum" }
+];
+
 let blindLevels = JSON.parse(localStorage.getItem('dc_blinds')) || JSON.parse(JSON.stringify(DEFAULT_BLINDS));
 let members = JSON.parse(localStorage.getItem('dc_members')) || [];
 let ranking = JSON.parse(localStorage.getItem('dc_ranking')) || {}; 
@@ -34,6 +41,7 @@ window.onload = () => {
     renderPlayers();
     updateTournamentStats();
     renderBlindConfig();
+    renderSchedule(); // Renderiza a agenda
 };
 
 function showSection(sectionId, btnElement) {
@@ -43,17 +51,27 @@ function showSection(sectionId, btnElement) {
     btnElement.classList.add('active');
 }
 
-// ==========================================
-// FUNÇÃO AUXILIAR: AVATAR INTELIGENTE
-// ==========================================
-// Se o cara não tiver foto cadastrada, cria um avatar verde com as iniciais do nome dele
 function getPlayerPhoto(playerName) {
     const member = members.find(m => m.name === playerName);
-    if (member && member.photo) {
-        return member.photo;
-    }
-    // API que gera a imagem com iniciais
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(playerName)}&background=22c55e&color=fff&bold=true&size=100`;
+    if (member && member.photo) return member.photo;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(playerName)}&background=facc15&color=000&bold=true&size=100`;
+}
+
+// ==========================================
+// AGENDA
+// ==========================================
+function renderSchedule() {
+    const tbody = document.getElementById('schedule-list');
+    tbody.innerHTML = TOURNAMENT_SCHEDULE.map(s => {
+        let statusColor = s.status === "Confirmado" ? "var(--primary)" : (s.status === "Inscrições Abertas" ? "var(--accent)" : "var(--text-dim)");
+        return `
+        <tr>
+            <td><strong>${s.date}</strong></td>
+            <td>${s.event}</td>
+            <td>${s.buyin}</td>
+            <td style="color: ${statusColor}; text-shadow: 0 0 10px ${statusColor}40;">${s.status}</td>
+        </tr>`;
+    }).join('');
 }
 
 // ==========================================
@@ -136,9 +154,6 @@ function updateBlindDisplay() {
     document.getElementById('display-next-blind').innerText = next ? `${next.sb} / ${next.bb}` : "FINAL";
 }
 
-// ==========================================
-// CONFIGURAÇÃO EDITÁVEL DE BLINDS
-// ==========================================
 function renderBlindConfig() {
     const tbody = document.getElementById('blind-config-list');
     tbody.innerHTML = blindLevels.map((b, i) => `
@@ -160,7 +175,7 @@ function updateBlindData(index, field, value) {
 }
 
 function resetDefaultBlinds() {
-    if(confirm("Restaurar estrutura padrão (Stack 500, começando em 5/10)?")) {
+    if(confirm("Restaurar estrutura padrão?")) {
         blindLevels = JSON.parse(JSON.stringify(DEFAULT_BLINDS)); 
         localStorage.setItem('dc_blinds', JSON.stringify(blindLevels));
         renderBlindConfig();
@@ -170,23 +185,17 @@ function resetDefaultBlinds() {
 }
 
 // ==========================================
-// GESTÃO DE MEMBROS E AVATARES
+// GESTÃO DE MEMBROS E JOGO
 // ==========================================
 function registerNewMember() {
     const nameInput = document.getElementById('new-member-name');
     const photoInput = document.getElementById('new-member-photo');
-    
     const name = nameInput.value.trim();
     const photo = photoInput.value.trim();
-    
     if (!name) return;
-
     if (members.find(m => m.name === name)) return alert("Este membro já existe!");
-
-    // Salva o membro com a foto (se tiver), se não fica vazio e a API resolve
     members.push({ name: name, photo: photo, date: new Date().toLocaleDateString() });
     localStorage.setItem('dc_members', JSON.stringify(members));
-    
     nameInput.value = "";
     photoInput.value = "";
     renderMembers();
@@ -195,7 +204,6 @@ function registerNewMember() {
 function renderMembers() {
     const table = document.getElementById('members-list-table');
     const select = document.getElementById('member-select');
-    
     table.innerHTML = members.map((m, i) => `
         <tr>
             <td>
@@ -208,7 +216,6 @@ function renderMembers() {
             <td><button class="btn-remove" onclick="deleteMember(${i})">X</button></td>
         </tr>
     `).join('');
-
     select.innerHTML = '<option value="">Selecione um membro...</option>' + 
         members.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
 }
@@ -221,16 +228,11 @@ function deleteMember(index) {
     }
 }
 
-// ==========================================
-// GESTÃO DO JOGO ATUAL
-// ==========================================
 function addMemberToTable() {
     const select = document.getElementById('member-select');
     const name = select.value;
     if (!name) return;
-
     if (activePlayers.find(p => p.name === name)) return alert("Jogador já está na mesa!");
-
     activePlayers.push({ name: name, status: 'Ativo', rebuys: 0, tempGain: 0 }); 
     saveGameState();
     renderPlayers();
@@ -239,12 +241,10 @@ function addMemberToTable() {
 
 function renderPlayers() {
     const tbody = document.getElementById('player-list');
-    
     if(activePlayers.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-dim);">A mesa está vazia. Adicione os jogadores acima.</td></tr>`;
         return;
     }
-
     tbody.innerHTML = activePlayers.map((p, i) => `
         <tr>
             <td class="${p.status === 'Ativo' ? 'status-active' : 'status-busted'}">
@@ -255,12 +255,10 @@ function renderPlayers() {
             </td>
             <td class="${p.status === 'Ativo' ? 'status-active' : 'status-busted'}">${p.status}</td>
             <td>${p.rebuys}</td>
-            <td>
-                <input type="number" placeholder="0.00" step="1" min="0" onchange="updateProfit(${i}, this.value)" value="${p.tempGain > 0 ? p.tempGain : ''}">
-            </td>
+            <td><input type="number" placeholder="0.00" step="1" min="0" onchange="updateProfit(${i}, this.value)" value="${p.tempGain > 0 ? p.tempGain : ''}"></td>
             <td>
                 <button class="btn-action" onclick="addRebuy(${i})">+ RB</button>
-                <button class="btn-remove" onclick="toggleBust(${i})">${p.status === 'Ativo' ? 'Bust (Caiu)' : 'Voltar'}</button>
+                <button class="btn-remove" onclick="toggleBust(${i})">${p.status === 'Ativo' ? 'Bust' : 'Voltar'}</button>
             </td>
         </tr>
     `).join('');
@@ -297,25 +295,17 @@ function updateTournamentStats() {
     document.getElementById('prize-winner-all').innerText = `R$ ${totalMoney.toFixed(2)}`;
 }
 
-function saveGameState() { 
-    localStorage.setItem('dc_active_game', JSON.stringify(activePlayers)); 
-}
+function saveGameState() { localStorage.setItem('dc_active_game', JSON.stringify(activePlayers)); }
 
-// ==========================================
-// RANKING
-// ==========================================
 function finishTournament() {
     if (activePlayers.length === 0) return alert("Não há jogo para encerrar.");
     if (!confirm("Isso vai encerrar o jogo e atualizar o Ranking Geral. Confirmar?")) return;
 
     activePlayers.forEach(p => {
         if (!ranking[p.name]) ranking[p.name] = { games: 0, wins: 0, profit: 0 };
-        
         ranking[p.name].games += 1;
-        
         const sessionProfit = (p.tempGain || 0) - (BUYIN_MONEY + (p.rebuys * REBUY_MONEY));
         ranking[p.name].profit += sessionProfit;
-        
         if (p.tempGain > 0) ranking[p.name].wins += 1; 
     });
 
@@ -329,14 +319,12 @@ function finishTournament() {
     renderPlayers();
     updateTournamentStats();
     renderRanking();
-    
     showSection('ranking-section', document.querySelectorAll('.nav-btn')[3]);
 }
 
 function renderRanking() {
     const table = document.getElementById('global-ranking-table');
-    const sorted = Object.entries(ranking)
-        .sort((a, b) => b[1].profit - a[1].profit);
+    const sorted = Object.entries(ranking).sort((a, b) => b[1].profit - a[1].profit);
 
     if (sorted.length === 0) {
         table.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-dim);">Nenhum histórico registrado.</td></tr>`;
@@ -356,10 +344,7 @@ function renderRanking() {
                 </td>
                 <td>${stats.games}</td>
                 <td>${stats.wins}</td>
-                <td style="color: ${stats.profit >= 0 ? 'var(--primary)' : 'var(--danger)'}">
-                    R$ ${stats.profit.toFixed(2)}
-                </td>
-            </tr>
-        `;
+                <td style="color: ${stats.profit >= 0 ? 'var(--primary)' : 'var(--danger)'}">R$ ${stats.profit.toFixed(2)}</td>
+            </tr>`;
     }).join('');
 }
