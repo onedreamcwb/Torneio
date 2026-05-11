@@ -59,25 +59,14 @@
 
         <section id="members-section" class="spa-section">
             <div class="card">
-                <h2>GESTÃO DE ATLETAS (DREAM HOUSE)</h2>
+                <h2>GESTÃO DE ATLETAS</h2>
                 <div class="input-group">
-                    <input type="text" id="new-member-name" placeholder="Nome do Jogador..." class="poker-input" style="flex: 1;">
-                    <input type="url" id="new-member-photo" placeholder="URL da Foto (Instagram, Imgur, etc)..." class="poker-input" style="flex: 2;">
+                    <input type="text" id="new-member-name" placeholder="Nome..." class="poker-input">
+                    <input type="url" id="new-member-photo" placeholder="URL da Foto..." class="poker-input">
                     <button class="btn-poker btn-start" onclick="registerNewMember()">CADASTRAR</button>
                 </div>
-                
-                <p class="helper-text">* Os dados de desempenho abaixo são atualizados automaticamente após cada torneio finalizado.</p>
-                
                 <table class="poker-table">
-                    <thead>
-                        <tr>
-                            <th>JOGADOR / PERFIL</th>
-                            <th style="text-align:center;">JOGOS</th>
-                            <th style="text-align:center;">VITÓRIAS</th>
-                            <th style="text-align:center;">RESULTADO (R$)</th>
-                            <th style="text-align:right;">AÇÕES</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>JOGADOR / PERFIL</th><th>JOGOS</th><th>VITÓRIAS</th><th>RESULTADO (R$)</th><th>AÇÕES</th></tr></thead>
                     <tbody id="members-list-table"></tbody>
                 </table>
             </div>
@@ -85,11 +74,9 @@
 
         <section id="ranking-section" class="spa-section">
             <div class="card">
-                <h2>HALL DA FAMA - RANKING POR LUCRO</h2>
+                <h2>HALL DA FAMA</h2>
                 <table class="poker-table">
-                    <thead>
-                        <tr><th>POS</th><th>JOGADOR</th><th>JOGOS</th><th>VITÓRIAS</th><th>LUCRO TOTAL (R$)</th></tr>
-                    </thead>
+                    <thead><tr><th>POS</th><th>JOGADOR</th><th>JOGOS</th><th>VITÓRIAS</th><th>LUCRO TOTAL (R$)</th></tr></thead>
                     <tbody id="global-ranking-table"></tbody>
                 </table>
             </div>
@@ -99,11 +86,9 @@
             <div class="card">
                 <h2>PREMIAÇÃO ESTIMADA</h2>
                 <div class="prize-total">POTE TOTAL: <span id="total-money-prize" class="lucro-positivo">R$ 0,00</span></div>
-                <table class="poker-table" style="margin-top: 20px;">
+                <table class="poker-table">
                     <thead><tr><th>POSIÇÃO</th><th>PRÊMIO</th></tr></thead>
-                    <tbody>
-                        <tr><td><strong style="color:var(--accent);">1º LUGAR (Campeão)</strong></td><td id="prize-winner-all" style="color:var(--primary); font-weight:bold; font-size: 32px;">R$ 0,00</td></tr>
-                    </tbody>
+                    <tbody><tr><td><strong>1º LUGAR (Campeão)</strong></td><td id="prize-winner-all" class="champion-prize">R$ 0,00</td></tr></tbody>
                 </table>
             </div>
         </section>
@@ -111,52 +96,50 @@
         <section id="schedule-section" class="spa-section">
             <div class="card">
                 <h2>AGENDA DA DREAM HOUSE</h2>
-                <p class="helper-text">Próximos eventos oficiais confirmados no nosso clube.</p>
                 <table class="poker-table">
-                    <thead>
-                        <tr><th>DATA / HORA</th><th>EVENTO / FORMATO</th><th>BUY-IN</th><th>STATUS</th></tr>
-                    </thead>
-                    <tbody id="schedule-list">
-                        </tbody>
+                    <thead><tr><th>DATA / HORA</th><th>EVENTO</th><th>BUY-IN</th><th>STATUS</th></tr></thead>
+                    <tbody id="schedule-list"></tbody>
                 </table>
             </div>
         </section>
 
         <section id="about-section" class="spa-section">
-            <div class="card" style="text-align: center; padding: 60px 40px;">
-                <h2 style="font-size: 50px; color: var(--primary); text-shadow: 0 0 20px var(--primary-glow); border: none;">DREAM HOUSE</h2>
-                <h3 style="color: var(--accent); letter-spacing: 5px; margin-bottom: 30px;">POKER CLUB</h3>
+            <div class="card about-container">
+                <h2 class="about-title">DREAM HOUSE</h2>
+                <h3 class="about-subtitle">POKER CLUB</h3>
                 
-                <img src="./assets/Gemini_Generated_Image_j15esvj15esvj15e.png" style="width: 300px; height: 300px; object-fit: cover; border-radius: 50%; margin: 20px auto; border: 4px solid var(--primary); box-shadow: 0 0 30px var(--primary-glow);" alt="Dream House Logo">
+                <img src="./assets/Gemini_Generated_Image_j15esvj15esvj15e.png" class="about-logo" alt="Dream House Logo">
                 
-                <p style="font-size: 24px; color: var(--text-main); line-height: 1.6; max-width: 900px; margin: 40px auto;">
-                    O mais exclusivo e tecnológico home game da região. A <strong>Dream House</strong> foi criada para reunir amigos em torno da mesa com uma estrutura de nível profissional. Levamos o Poker a sério: respeito às regras, estratégia afiada, gestão de bankroll e rivalidade saudável. No feltro não há amizade, apenas esporte mental.
+                <p class="about-description">
+                    O mais exclusivo e tecnológico home game da região. A <strong>Dream House</strong> foi criada para reunir amigos em torno da mesa com uma estrutura de nível profissional. No feltro não há amizade, apenas esporte mental.
                 </p>
                 
-                <div style="margin-top: 50px; display: flex; justify-content: center; gap: 60px;">
-                    <div class="stat-box" style="flex: none; width: 250px;">
-                        <span>MODALIDADE</span>
-                        <h3 style="font-size: 30px;">SNG 4-Handed</h3>
+                <div class="about-stats-grid">
+                    <div class="stat-box mini-stat"><span>MODALIDADE</span><h3>SNG 4-Handed</h3></div>
+                    <div class="stat-box mini-stat"><span>REGRA BASE</span><h3>Winner Takes All</h3></div>
+                </div>
+
+                <div class="discord-section">
+                    <h2 class="discord-title">COMUNIDADE ONLINE</h2>
+                    <p class="helper-text">Acompanhe quem está ativo no nosso servidor oficial.</p>
+                    
+                    <div class="discord-widget-wrapper">
+                        <iframe src="https://discord.com/widget?id=1040042084935151676&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
                     </div>
-                    <div class="stat-box" style="flex: none; width: 250px;">
-                        <span>REGRA BASE</span>
-                        <h3 style="font-size: 30px;">Winner Takes All</h3>
-                    </div>
+                    
+                    <a href="https://discord.gg/Ty2bcDhrzN" target="_blank" class="btn-poker btn-start discord-cta">ENTRAR NO DISCORD</a>
                 </div>
             </div>
         </section>
 
         <section id="config-section" class="spa-section">
             <div class="card">
-                <h2>ESTRUTURA DE BLINDS (EDITÁVEL)</h2>
-                <p class="helper-text">* As edições são salvas automaticamente no navegador.</p>
+                <h2>ESTRUTURA DE BLINDS</h2>
                 <table class="poker-table">
-                    <thead>
-                        <tr><th>NÍVEL</th><th>SMALL BLIND</th><th>BIG BLIND</th><th>TEMPO (MIN)</th></tr>
-                    </thead>
+                    <thead><tr><th>NÍVEL</th><th>SMALL</th><th>BIG</th><th>TEMPO (MIN)</th></tr></thead>
                     <tbody id="blind-config-list"></tbody>
                 </table>
-                <button class="btn-poker btn-start" onclick="resetDefaultBlinds()" style="margin-top: 20px; font-size: 16px;">Restaurar Padrão</button>
+                <button class="btn-poker btn-start" onclick="resetDefaultBlinds()">RESTAURAR PADRÃO</button>
             </div>
         </section>
     </main>

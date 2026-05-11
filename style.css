@@ -1,19 +1,36 @@
 :root {
-    /* PALETA TECNOLÓGICA (CYBER YELLOW) */
     --bg-overlay: rgba(10, 10, 12, 0.93);
     --card-bg: rgba(20, 20, 25, 0.7);
     --card-border: rgba(250, 204, 21, 0.15);
-    
     --primary: #facc15;
     --primary-glow: rgba(250, 204, 21, 0.3);
     --accent: #38bdf8;
-    
     --text-main: #f8fafc;
     --text-dim: #94a3b8;
-    
     --warning: #f97316;
     --danger: #ef4444;
 }
+
+/* ... Estilos base anteriores permanecem ... */
+
+/* QUEM SOMOS - CLASSES ESPECÍFICAS */
+.about-container { text-align: center; padding: 60px 40px; }
+.about-title { font-size: 50px !important; color: var(--primary); text-shadow: 0 0 20px var(--primary-glow); border: none !important; }
+.about-subtitle { color: var(--accent); letter-spacing: 5px; margin-bottom: 30px; text-transform: uppercase; }
+.about-logo { width: 300px; height: 300px; object-fit: cover; border-radius: 50%; margin: 20px auto; border: 4px solid var(--primary); box-shadow: 0 0 30px var(--primary-glow); }
+.about-description { font-size: 24px; color: var(--text-main); line-height: 1.6; max-width: 900px; margin: 40px auto; }
+.about-stats-grid { display: flex; justify-content: center; gap: 60px; margin-bottom: 50px; }
+.mini-stat { flex: none !important; width: 250px; }
+
+/* DISCORD INTEGRATION */
+.discord-section { margin-top: 80px; padding-top: 50px; border-top: 1px solid var(--card-border); }
+.discord-title { color: var(--accent) !important; font-size: 32px !important; margin-bottom: 10px !important; border: none !important; }
+.discord-widget-wrapper { max-width: 800px; margin: 30px auto; border: 2px solid var(--card-border); border-radius: 12px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+.discord-cta { display: inline-block; text-decoration: none; margin-top: 20px; min-width: 300px; }
+
+/* ESTILOS DE TABELAS E AUXILIARES */
+.champion-prize { color: var(--primary); font-weight: bold; font-size: 32px; text-shadow: 0 0 10px var(--primary-glow); }
+.member-stat-cell { text-align: center; font-weight: bold; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
 

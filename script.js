@@ -374,6 +374,22 @@ function renderRanking() {
             </tr>`;
     }).join('');
 }
+// ... Constantes e Estado Global anteriores ...
+
+window.onload = () => {
+    updateBlindDisplay();
+    updateTimerDisplay();
+    renderMembers();
+    renderRanking();
+    renderPlayers();
+    updateTournamentStats();
+    renderBlindConfig();
+    renderSchedule();
+};
+
+// ... Funções de Timer, Navegação e Membros permanecem iguais ...
+
+// Certifique-se de preencher a URL real do Discord nas configurações do servidor para o Widget funcionar.
 
 // ==========================================
 // RENDERIZAR AGENDA DE EVENTOS
