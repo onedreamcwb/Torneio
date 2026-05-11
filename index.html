@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dream House - Poker Club</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <nav class="tv-nav">
@@ -74,11 +75,19 @@
 
         <section id="ranking-section" class="spa-section">
             <div class="card">
-                <h2>HALL DA FAMA</h2>
-                <table class="poker-table">
-                    <thead><tr><th>POS</th><th>JOGADOR</th><th>JOGOS</th><th>VITÓRIAS</th><th>LUCRO TOTAL (R$)</th></tr></thead>
-                    <tbody id="global-ranking-table"></tbody>
-                </table>
+                <div id="ranking-capture-area" class="capture-area">
+                    <div class="capture-header">
+                        <img src="./assets/Gemini_Generated_Image_j15esvj15esvj15e.png" class="capture-logo" alt="Dream House Logo">
+                        <h2>HALL DA FAMA - DREAM HOUSE</h2>
+                    </div>
+                    <table class="poker-table">
+                        <thead>
+                            <tr><th>POS</th><th>JOGADOR</th><th>JOGOS</th><th>VITÓRIAS</th><th>LUCRO TOTAL (R$)</th></tr>
+                        </thead>
+                        <tbody id="global-ranking-table"></tbody>
+                    </table>
+                </div>
+                <button class="btn-poker btn-download" onclick="downloadRanking()">📸 BAIXAR RANKING (PNG)</button>
             </div>
         </section>
 

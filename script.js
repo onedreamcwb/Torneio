@@ -374,6 +374,40 @@ function renderRanking() {
             </tr>`;
     }).join('');
 }
+// ==========================================
+// GERADOR DE IMAGEM PARA REDES SOCIAIS (PNG)
+// ==========================================
+function downloadRanking() {
+    const captureArea = document.getElementById('ranking-capture-area');
+    
+    // Mostra um aviso pro usuário caso demore 1 ou 2 segundos
+    const btn = document.querySelector('.btn-download');
+    const originalText = btn.innerText;
+    btn.innerText = "⏳ GERANDO IMAGEM...";
+    btn.style.opacity = "0.7";
+
+    // html2canvas tira o "print" da div
+    html2canvas(captureArea, {
+        backgroundColor: "#0a0a0c", // Cor de fundo da imagem
+        scale: 2, // Aumenta a resolução da imagem para não ficar borrada
+        useCORS: true // Permite capturar as fotos de perfil (avatares)
+    }).then(canvas => {
+        // Cria um link invisível para forçar o download
+        const link = document.createElement('a');
+        link.download = 'DreamHouse_HallDaFama.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+
+        // Restaura o botão
+        btn.innerText = originalText;
+        btn.style.opacity = "1";
+    }).catch(err => {
+        console.error("Erro ao gerar imagem: ", err);
+        alert("Ops! Ocorreu um erro ao gerar a imagem.");
+        btn.innerText = originalText;
+        btn.style.opacity = "1";
+    });
+}
 // ... Constantes e Estado Global anteriores ...
 
 window.onload = () => {
@@ -385,7 +419,7 @@ window.onload = () => {
     updateTournamentStats();
     renderBlindConfig();
     renderSchedule();
-};
+}
 
 // ... Funções de Timer, Navegação e Membros permanecem iguais ...
 
