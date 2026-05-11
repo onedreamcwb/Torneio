@@ -17,7 +17,7 @@ const DEFAULT_BLINDS = [
     { level: 8, sb: 150, bb: 300, duration: 15 }
 ];
 
-// LISTA DE PRÓXIMOS TORNEIOS (Edite aqui facilmente!)
+// LISTA DA AGENDA (Edite os próximos torneios aqui!)
 const TOURNAMENT_SCHEDULE = [
     { date: "Sexta-feira, 20:00", event: "Dream House Main Event", buyin: "R$ 1,00", status: "Confirmado" },
     { date: "Sábado, 19:30", event: "Deepstack Turbo (Stack 1000)", buyin: "R$ 2,00", status: "Inscrições Abertas" },
@@ -41,9 +41,12 @@ window.onload = () => {
     renderPlayers();
     updateTournamentStats();
     renderBlindConfig();
-    renderSchedule(); // Renderiza a agenda
+    renderSchedule();
 };
 
+// ==========================================
+// NAVEGAÇÃO E UTILS
+// ==========================================
 function showSection(sectionId, btnElement) {
     document.querySelectorAll('.spa-section').forEach(sec => sec.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -55,23 +58,6 @@ function getPlayerPhoto(playerName) {
     const member = members.find(m => m.name === playerName);
     if (member && member.photo) return member.photo;
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(playerName)}&background=facc15&color=000&bold=true&size=100`;
-}
-
-// ==========================================
-// AGENDA
-// ==========================================
-function renderSchedule() {
-    const tbody = document.getElementById('schedule-list');
-    tbody.innerHTML = TOURNAMENT_SCHEDULE.map(s => {
-        let statusColor = s.status === "Confirmado" ? "var(--primary)" : (s.status === "Inscrições Abertas" ? "var(--accent)" : "var(--text-dim)");
-        return `
-        <tr>
-            <td><strong>${s.date}</strong></td>
-            <td>${s.event}</td>
-            <td>${s.buyin}</td>
-            <td style="color: ${statusColor}; text-shadow: 0 0 10px ${statusColor}40;">${s.status}</td>
-        </tr>`;
-    }).join('');
 }
 
 // ==========================================
@@ -185,7 +171,7 @@ function resetDefaultBlinds() {
 }
 
 // ==========================================
-// GESTÃO DE MEMBROS E JOGO
+// GESTÃO DE MEMBROS (CADASTRO E FOTOS)
 // ==========================================
 function registerNewMember() {
     const nameInput = document.getElementById('new-member-name');
@@ -194,8 +180,10 @@ function registerNewMember() {
     const photo = photoInput.value.trim();
     if (!name) return;
     if (members.find(m => m.name === name)) return alert("Este membro já existe!");
+    
     members.push({ name: name, photo: photo, date: new Date().toLocaleDateString() });
     localStorage.setItem('dc_members', JSON.stringify(members));
+    
     nameInput.value = "";
     photoInput.value = "";
     renderMembers();
@@ -204,20 +192,48 @@ function registerNewMember() {
 function renderMembers() {
     const table = document.getElementById('members-list-table');
     const select = document.getElementById('member-select');
-    table.innerHTML = members.map((m, i) => `
+    
+    table.innerHTML = members.map((m, i) => {
+        const stats = ranking[m.name] || { games: 0, wins: 0, profit: 0 };
+        const profitColor = stats.profit >= 0 ? 'var(--primary)' : 'var(--danger)';
+        const profitSymbol = stats.profit > 0 ? '+' : '';
+
+        return `
         <tr>
             <td>
                 <div class="player-profile">
                     <img src="${getPlayerPhoto(m.name)}" class="player-avatar" alt="${m.name}">
-                    <span>${m.name}</span>
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-weight: bold;">${m.name}</span>
+                        <small style="color: var(--text-dim); font-size: 14px;">Membro desde ${m.date}</small>
+                    </div>
                 </div>
             </td>
-            <td>${m.date}</td>
-            <td><button class="btn-remove" onclick="deleteMember(${i})">X</button></td>
-        </tr>
-    `).join('');
+            <td class="member-stat-cell">${stats.games}</td>
+            <td class="member-stat-cell" style="color: var(--primary);">${stats.wins}</td>
+            <td class="member-stat-cell" style="color: ${profitColor}; text-shadow: 0 0 10px ${profitColor}40;">
+                ${profitSymbol}R$ ${stats.profit.toFixed(2)}
+            </td>
+            <td style="text-align: right;">
+                <button class="btn-edit-photo" onclick="editMemberPhoto(${i})">📸 FOTO</button>
+                <button class="btn-remove" onclick="deleteMember(${i})">X</button>
+            </td>
+        </tr>`;
+    }).join('');
+
     select.innerHTML = '<option value="">Selecione um membro...</option>' + 
         members.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+}
+
+function editMemberPhoto(index) {
+    const newPhotoUrl = prompt("Insira a nova URL da foto para " + members[index].name + ":", members[index].photo || "");
+    if (newPhotoUrl !== null) {
+        members[index].photo = newPhotoUrl.trim();
+        localStorage.setItem('dc_members', JSON.stringify(members));
+        renderMembers();
+        renderRanking();
+        renderPlayers();
+    }
 }
 
 function deleteMember(index) {
@@ -228,11 +244,15 @@ function deleteMember(index) {
     }
 }
 
+// ==========================================
+// GESTÃO DA MESA (JOGO ATUAL)
+// ==========================================
 function addMemberToTable() {
     const select = document.getElementById('member-select');
     const name = select.value;
     if (!name) return;
     if (activePlayers.find(p => p.name === name)) return alert("Jogador já está na mesa!");
+    
     activePlayers.push({ name: name, status: 'Ativo', rebuys: 0, tempGain: 0 }); 
     saveGameState();
     renderPlayers();
@@ -297,6 +317,9 @@ function updateTournamentStats() {
 
 function saveGameState() { localStorage.setItem('dc_active_game', JSON.stringify(activePlayers)); }
 
+// ==========================================
+// RANKING E FINALIZAÇÃO DE TORNEIO
+// ==========================================
 function finishTournament() {
     if (activePlayers.length === 0) return alert("Não há jogo para encerrar.");
     if (!confirm("Isso vai encerrar o jogo e atualizar o Ranking Geral. Confirmar?")) return;
@@ -314,11 +337,12 @@ function finishTournament() {
     currentLevelIdx = 0;
     saveGameState();
     
-    alert("Ranking Atualizado!");
+    alert("Ranking Atualizado com Sucesso!");
     resetTimer();
     renderPlayers();
     updateTournamentStats();
     renderRanking();
+    renderMembers(); // Atualiza os dados de Lucro na tela de membros
     showSection('ranking-section', document.querySelectorAll('.nav-btn')[3]);
 }
 
@@ -342,9 +366,28 @@ function renderRanking() {
                         <span>${name}</span>
                     </div>
                 </td>
-                <td>${stats.games}</td>
-                <td>${stats.wins}</td>
-                <td style="color: ${stats.profit >= 0 ? 'var(--primary)' : 'var(--danger)'}">R$ ${stats.profit.toFixed(2)}</td>
+                <td class="member-stat-cell">${stats.games}</td>
+                <td class="member-stat-cell">${stats.wins}</td>
+                <td class="member-stat-cell" style="color: ${stats.profit >= 0 ? 'var(--primary)' : 'var(--danger)'}">
+                    R$ ${stats.profit.toFixed(2)}
+                </td>
             </tr>`;
+    }).join('');
+}
+
+// ==========================================
+// RENDERIZAR AGENDA DE EVENTOS
+// ==========================================
+function renderSchedule() {
+    const tbody = document.getElementById('schedule-list');
+    tbody.innerHTML = TOURNAMENT_SCHEDULE.map(s => {
+        let statusColor = s.status === "Confirmado" ? "var(--primary)" : (s.status === "Inscrições Abertas" ? "var(--accent)" : "var(--text-dim)");
+        return `
+        <tr>
+            <td><strong>${s.date}</strong></td>
+            <td>${s.event}</td>
+            <td>${s.buyin}</td>
+            <td style="color: ${statusColor}; text-shadow: 0 0 10px ${statusColor}40; font-weight: bold;">${s.status}</td>
+        </tr>`;
     }).join('');
 }

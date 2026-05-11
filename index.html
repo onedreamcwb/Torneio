@@ -59,14 +59,25 @@
 
         <section id="members-section" class="spa-section">
             <div class="card">
-                <h2>CADASTRO DE MEMBROS (DREAM HOUSE)</h2>
+                <h2>GESTÃO DE ATLETAS (DREAM HOUSE)</h2>
                 <div class="input-group">
-                    <input type="text" id="new-member-name" placeholder="Nome..." class="poker-input" style="flex: 1;">
-                    <input type="url" id="new-member-photo" placeholder="Link da Foto (Opcional)..." class="poker-input" style="flex: 2;">
+                    <input type="text" id="new-member-name" placeholder="Nome do Jogador..." class="poker-input" style="flex: 1;">
+                    <input type="url" id="new-member-photo" placeholder="URL da Foto (Instagram, Imgur, etc)..." class="poker-input" style="flex: 2;">
                     <button class="btn-poker btn-start" onclick="registerNewMember()">CADASTRAR</button>
                 </div>
+                
+                <p class="helper-text">* Os dados de desempenho abaixo são atualizados automaticamente após cada torneio finalizado.</p>
+                
                 <table class="poker-table">
-                    <thead><tr><th>JOGADOR</th><th>DATA CADASTRO</th><th>AÇÃO</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>JOGADOR / PERFIL</th>
+                            <th style="text-align:center;">JOGOS</th>
+                            <th style="text-align:center;">VITÓRIAS</th>
+                            <th style="text-align:center;">RESULTADO (R$)</th>
+                            <th style="text-align:right;">AÇÕES</th>
+                        </tr>
+                    </thead>
                     <tbody id="members-list-table"></tbody>
                 </table>
             </div>
@@ -119,7 +130,7 @@
                 <img src="./assets/Gemini_Generated_Image_j15esvj15esvj15e.png" style="width: 300px; height: 300px; object-fit: cover; border-radius: 50%; margin: 20px auto; border: 4px solid var(--primary); box-shadow: 0 0 30px var(--primary-glow);" alt="Dream House Logo">
                 
                 <p style="font-size: 24px; color: var(--text-main); line-height: 1.6; max-width: 900px; margin: 40px auto;">
-                    O mais home game da região. A <strong>Dream House</strong> foi criada para reunir amigos em torno da mesa com uma estrutura inicial bem humilde mas a idéia é sempre estarmos melhorando. Levamos o Poker a sério: respeito às regras, estratégia afiada, gestão de bankroll e rivalidade saudável. No feltro não há amizade, apenas esporte mental. Se você curte jogar poker e quer conhecer gente nova vem com a gente!
+                    O mais exclusivo e tecnológico home game da região. A <strong>Dream House</strong> foi criada para reunir amigos em torno da mesa com uma estrutura de nível profissional. Levamos o Poker a sério: respeito às regras, estratégia afiada, gestão de bankroll e rivalidade saudável. No feltro não há amizade, apenas esporte mental.
                 </p>
                 
                 <div style="margin-top: 50px; display: flex; justify-content: center; gap: 60px;">
